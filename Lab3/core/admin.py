@@ -1,6 +1,8 @@
-from typing import Union, Optional
+from typing import Optional
 
 from django.contrib import admin
+from django.db.models import QuerySet
+
 from .models import Blog, Comment, BlockList, File, BlogUser, BlockList
 from rangefilter.filters import DateTimeRangeFilter, DateRangeFilterBuilder
 
@@ -14,6 +16,7 @@ class BlogAdmin(admin.ModelAdmin):
     )
     list_display = ('title', 'author')
     search_fields = ('title', 'content')
+    readonly_fields = ('author',)
 
     def has_view_permission(self, request, obj: Optional[Blog] = None):
         if obj is None:
@@ -51,10 +54,34 @@ class BlogAdmin(admin.ModelAdmin):
 
         return False
 
+    def get_queryset(self, request):
+        qs: QuerySet = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        # return the blogs where the current user is not blocked
+        blocked_by = BlockList.objects.filter(blocked_user__user=request.user).values_list('user', flat=True)
+        return qs.exclude(author__user__in=blocked_by)
+
+    def save_model(self, request, obj: Blog, form, change):
+        if not change:
+            obj.author = BlogUser.objects.get(user=request.user)
+        super().save_model(request, obj, form, change)
+
 
 class CommentAdmin(admin.ModelAdmin):
+    readonly_fields = ('author',)
+
     def has_add_permission(self, request):
         return True
+
+    def has_view_permission(self, request, obj: Optional[Comment] = None):
+        if obj is None:
+            return True
+
+        if request.user not in obj.author.blocked_users.values_list('user', flat=True):
+            return True
+
+        return False
 
     def has_delete_permission(self, request, obj: Optional[Comment] = None):
         return self.edit_delete_permission(request, obj)
@@ -75,13 +102,37 @@ class CommentAdmin(admin.ModelAdmin):
 
         return False
 
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.author = BlogUser.objects.get(user=request.user)
+        super().save_model(request, obj, form, change)
 
-class PostUserAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        blocked = BlockList.objects.filter(user__user=request.user).values_list('user', flat=True)
+        return qs.exclude(author__user__in=blocked)
+
+
+class BlogUserAdmin(admin.ModelAdmin):
     def has_view_permission(self, request, obj=None):
         return True
 
     def has_add_permission(self, request):
-        return True
+        if request.user.is_superuser:
+            return True
+
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        if obj is None:
+            return False
+
+        if request.user.is_superuser:
+            return True
+
+        return False
 
     def has_change_permission(self, request, obj: Optional[BlogUser] = None):
         if obj is None:
@@ -97,12 +148,49 @@ class PostUserAdmin(admin.ModelAdmin):
 
 
 class FileAdmin(admin.ModelAdmin):
-    pass
+    def has_view_permission(self, request, obj: Optional[File]=None):
+        if obj is None:
+            return True
+        if request.user.is_superuser:
+            return True
+
+        blocked_by = BlockList.objects.filter(blocked_user__user=request.user).values_list('user', flat=True)
+        if request.user not in blocked_by:
+            return True
+
+        return False
+
+    def has_add_permission(self, request):
+        return True
+
+    def has_change_permission(self, request, obj: Optional[File] = None):
+        if obj is None:
+            return False
+
+        if request.user == obj.blog.author.user:
+            return True
+
+        if request.user.is_superuser:
+            return True
+
+        return False
+
+    def has_delete_permission(self, request, obj: Optional[File] = None):
+        if obj is None:
+            return False
+
+        if request.user == obj.blog.author.user:
+            return True
+
+        if request.user.is_superuser:
+            return True
+
+        return False
 
 
 class BlockListAdmin(admin.ModelAdmin):
     readonly_fields=('user', )
-    list_display = ("blocked_user",)
+    list_display = ("blocked_user", "user")
 
     def save_model(self, request, obj, form, change):
         obj.user = BlogUser.objects.get(user=request.user)
@@ -126,14 +214,22 @@ class BlockListAdmin(admin.ModelAdmin):
     def has_view_permission(self, request, obj: Optional[BlockList] = None):
         if obj is None:
             return True
+        if request.user.is_superuser:
+            return True
         if obj.user.user == request.user:
             return True
 
         return False
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(user__user=request.user)
+
 
 admin.site.register(Blog, BlogAdmin)
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(BlogUser, PostUserAdmin)
+admin.site.register(BlogUser, BlogUserAdmin)
 admin.site.register(File, FileAdmin)
 admin.site.register(BlockList, BlockListAdmin)
