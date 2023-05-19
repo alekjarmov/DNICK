@@ -15,7 +15,6 @@ class Blog(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(BlogUser, on_delete=models.CASCADE)
     content = models.TextField()
-    files = models.FileField(upload_to='files/', blank=True)
     created_at = models.DateField(auto_now_add=True)
     updated_at = models.DateField(auto_now=True)
 
