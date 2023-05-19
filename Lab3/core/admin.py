@@ -1,7 +1,7 @@
 from typing import Union, Optional
 
 from django.contrib import admin
-from .models import Blog, Comment, BlockList, File, BlogUser
+from .models import Blog, Comment, BlockList, File, BlogUser, BlockList
 from rangefilter.filters import DateTimeRangeFilter, DateRangeFilterBuilder
 
 
@@ -100,7 +100,40 @@ class FileAdmin(admin.ModelAdmin):
     pass
 
 
+class BlockListAdmin(admin.ModelAdmin):
+    readonly_fields=('user', )
+    list_display = ("blocked_user",)
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return True
+
+    def has_change_permission(self, request, obj: Optional[BlockList] = None):
+        if obj and obj.user == request.user:
+            return True
+
+        return False
+
+    def has_delete_permission(self, request, obj: Optional[BlockList] = None):
+        if obj and obj.user == request.user:
+            return True
+
+        return False
+
+    def has_view_permission(self, request, obj: Optional[BlockList] = None):
+        if obj is None:
+            return False
+        if obj.user.user == request.user:
+            return True
+
+        return False
+
+
 admin.site.register(Blog, BlogAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(BlogUser, PostUserAdmin)
 admin.site.register(File, FileAdmin)
+admin.site.register(BlockList, BlockListAdmin)
