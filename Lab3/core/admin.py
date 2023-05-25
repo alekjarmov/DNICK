@@ -11,12 +11,10 @@ from rangefilter.filters import DateTimeRangeFilter, DateRangeFilterBuilder
 
 
 class BlogAdmin(admin.ModelAdmin):
-    list_filter = (
-        ("created_at", DateRangeFilterBuilder(title="Created at")),
-    )
-    list_display = ('title', 'author')
-    search_fields = ('title', 'content')
-    readonly_fields = ('author',)
+    list_filter = (("created_at", DateRangeFilterBuilder(title="Created at")),)
+    list_display = ("title", "author")
+    search_fields = ("title", "content")
+    readonly_fields = ("author",)
 
     def has_view_permission(self, request, obj: Optional[Blog] = None):
         if obj is None:
@@ -25,7 +23,9 @@ class BlogAdmin(admin.ModelAdmin):
         if request.user not in obj.author.blocked_users.all():
             return True
 
-        if not BlockList.objects.filter(user=obj.author.user, blocked_user=request.user).exists():
+        if not BlockList.objects.filter(
+            user=obj.author.user, blocked_user=request.user
+        ).exists():
             return True  # alternative way to do it
 
         return False
@@ -59,7 +59,9 @@ class BlogAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         # return the blogs where the current user is not blocked
-        blocked_by = BlockList.objects.filter(blocked_user__user=request.user).values_list('user', flat=True)
+        blocked_by = BlockList.objects.filter(
+            blocked_user__user=request.user
+        ).values_list("user", flat=True)
         return qs.exclude(author__user__in=blocked_by)
 
     def save_model(self, request, obj: Blog, form, change):
@@ -69,7 +71,7 @@ class BlogAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    readonly_fields = ('author',)
+    readonly_fields = ("author",)
 
     def has_add_permission(self, request):
         return True
@@ -78,7 +80,7 @@ class CommentAdmin(admin.ModelAdmin):
         if obj is None:
             return True
 
-        if request.user not in obj.author.blocked_users.values_list('user', flat=True):
+        if request.user not in obj.author.blocked_users.values_list("user", flat=True):
             return True
 
         return False
@@ -111,7 +113,9 @@ class CommentAdmin(admin.ModelAdmin):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        blocked = BlockList.objects.filter(user__user=request.user).values_list('user', flat=True)
+        blocked = BlockList.objects.filter(user__user=request.user).values_list(
+            "user", flat=True
+        )
         return qs.exclude(author__user__in=blocked)
 
 
@@ -148,13 +152,15 @@ class BlogUserAdmin(admin.ModelAdmin):
 
 
 class FileAdmin(admin.ModelAdmin):
-    def has_view_permission(self, request, obj: Optional[File]=None):
+    def has_view_permission(self, request, obj: Optional[File] = None):
         if obj is None:
             return True
         if request.user.is_superuser:
             return True
 
-        blocked_by = BlockList.objects.filter(blocked_user__user=request.user).values_list('user', flat=True)
+        blocked_by = BlockList.objects.filter(
+            blocked_user__user=request.user
+        ).values_list("user", flat=True)
         if request.user not in blocked_by:
             return True
 
@@ -189,7 +195,7 @@ class FileAdmin(admin.ModelAdmin):
 
 
 class BlockListAdmin(admin.ModelAdmin):
-    readonly_fields=('user', )
+    readonly_fields = ("user",)
     list_display = ("blocked_user", "user")
 
     def save_model(self, request, obj, form, change):

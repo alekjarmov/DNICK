@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 # Create your models here.
 
 
@@ -24,7 +25,9 @@ class Blog(models.Model):
 
 class Comment(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="blog")
-    author = models.ForeignKey(BlogUser, on_delete=models.CASCADE, related_name="author")
+    author = models.ForeignKey(
+        BlogUser, on_delete=models.CASCADE, related_name="author"
+    )
     content = models.TextField()
     created_at = models.DateField(auto_now_add=True)
 
@@ -34,15 +37,19 @@ class Comment(models.Model):
 
 
 class BlockList(models.Model):
-    user = models.ForeignKey(BlogUser, on_delete=models.CASCADE, related_name="blocker_user")
-    blocked_user = models.ForeignKey(BlogUser, on_delete=models.CASCADE, related_name='blocked_users')
+    user = models.ForeignKey(
+        BlogUser, on_delete=models.CASCADE, related_name="blocker_user"
+    )
+    blocked_user = models.ForeignKey(
+        BlogUser, on_delete=models.CASCADE, related_name="blocked_users"
+    )
 
     def __str__(self):
         return self.user.user.username + " blocked " + self.blocked_user.user.username
 
 
 class File(models.Model):
-    file = models.FileField(upload_to='files/', blank=True)
+    file = models.FileField(upload_to="files/", blank=True)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="blog_file")
 
     def __str__(self):
