@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 # Create your models here.
 
 
@@ -12,7 +13,7 @@ class BlogUser(models.Model):
         return self.user.username
 
 
-class Blog(models.Model):
+class Post(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(BlogUser, on_delete=models.CASCADE)
     content = models.TextField()
@@ -24,7 +25,7 @@ class Blog(models.Model):
 
 
 class Comment(models.Model):
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="blog")
+    blog = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="blog")
     author = models.ForeignKey(
         BlogUser, on_delete=models.CASCADE, related_name="author"
     )
@@ -50,7 +51,7 @@ class BlockList(models.Model):
 
 class File(models.Model):
     file = models.FileField(upload_to="files/", blank=True)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, related_name="blog_file")
+    blog = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="blog_file")
 
     def __str__(self):
         return "File for " + self.blog.title + " blog"

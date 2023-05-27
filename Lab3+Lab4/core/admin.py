@@ -3,20 +3,20 @@ from typing import Optional
 from django.contrib import admin
 from django.db.models import QuerySet
 
-from .models import Blog, Comment, BlockList, File, BlogUser, BlockList
+from .models import Post, Comment, BlockList, File, BlogUser, BlockList
 from rangefilter.filters import DateTimeRangeFilter, DateRangeFilterBuilder
 
 
 # Register your models here.
 
 
-class BlogAdmin(admin.ModelAdmin):
+class PostAdmin(admin.ModelAdmin):
     list_filter = (("created_at", DateRangeFilterBuilder(title="Created at")),)
     list_display = ("title", "author")
     search_fields = ("title", "content")
     readonly_fields = ("author",)
 
-    def has_view_permission(self, request, obj: Optional[Blog] = None):
+    def has_view_permission(self, request, obj: Optional[Post] = None):
         if obj is None:
             return True
 
@@ -30,10 +30,10 @@ class BlogAdmin(admin.ModelAdmin):
 
         return False
 
-    def has_add_permission(self, request, obj: Optional[Blog] = None):
+    def has_add_permission(self, request, obj: Optional[Post] = None):
         return True
 
-    def has_change_permission(self, request, obj: Optional[Blog] = None):
+    def has_change_permission(self, request, obj: Optional[Post] = None):
         if obj is None:
             return False
 
@@ -64,7 +64,7 @@ class BlogAdmin(admin.ModelAdmin):
         ).values_list("user", flat=True)
         return qs.exclude(author__user__in=blocked_by)
 
-    def save_model(self, request, obj: Blog, form, change):
+    def save_model(self, request, obj: Post, form, change):
         if not change:
             obj.author = BlogUser.objects.get(user=request.user)
         super().save_model(request, obj, form, change)
@@ -234,7 +234,7 @@ class BlockListAdmin(admin.ModelAdmin):
         return qs.filter(user__user=request.user)
 
 
-admin.site.register(Blog, BlogAdmin)
+admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(BlogUser, BlogUserAdmin)
 admin.site.register(File, FileAdmin)

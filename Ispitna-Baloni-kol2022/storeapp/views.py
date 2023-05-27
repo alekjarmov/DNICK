@@ -1,5 +1,5 @@
 from django.shortcuts import render
-
+from .forms import FlightForm
 # Create your views here.
 
 
@@ -8,4 +8,6 @@ def index(request):
 
 
 def flights(request):
-    return render(request, 'flights.html')
+    context = {}
+    context['form'] = FlightForm()
+    return render(request, 'flights.html', context=context)
