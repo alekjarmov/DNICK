@@ -8,6 +8,11 @@ from django.contrib.auth.models import User
 class BlogUser(models.Model):
     user: User = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
+    avatar = models.ImageField(upload_to="data/", blank=True, null=True)
+    first_name = models.CharField(max_length=200, blank=True, null=True)
+    last_name = models.CharField(max_length=200, blank=True, null=True)
+    interests = models.CharField(max_length=200, blank=True, null=True)
+    profession = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.user.username

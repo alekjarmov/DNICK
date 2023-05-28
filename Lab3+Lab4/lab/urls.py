@@ -25,6 +25,7 @@ from django.conf import settings
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("posts/", posts, name="posts"),
+    path("", posts, name="index"),
     path("add/post/", add_post, name="add"),
     path("profile/", profile, name="profile"),
     path("blockedUsers/", blocked_users, name="blocked")

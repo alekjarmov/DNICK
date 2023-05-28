@@ -1,9 +1,27 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block content %}
 
-    <h1> Posts: </h1>
-    <a class="btn btn-success" href="/add/post/" role="button" >Add a Post</a>
+{% block content %}
+    <div class="row mt-3">
+        <div class="col-8">
+            <h1 class="row"> Welcome to your profile</h1>
+            <div>
+                <h3 class="row">Bio: </h3>
+                <p>{{ user.bio }}</p>
+                <div>
+                    <strong>Interests: </strong> {{ user.interests }}
+                </div>
+                <div>
+                    <strong>Profession: </strong> {{ user.profession }}
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center col-4">
+            <img src="{{ user.avatar.url }}" alt="user avatar"  style="height:20rem; width: 20rem">
+        </div>
+
+    </div>
+
+<h2>Posts by you: </h2>
     {% for post in posts %}
         <div class="card my-4">
             <div class="card-header">

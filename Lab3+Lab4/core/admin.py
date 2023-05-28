@@ -3,15 +3,12 @@ from typing import Optional
 from django.contrib import admin
 from django.db.models import QuerySet
 
-from .models import Post, Comment, BlockList, File, BlogUser, BlockList
-from rangefilter.filters import DateTimeRangeFilter, DateRangeFilterBuilder
-
-
+from .models import Post, Comment, BlockList, File, BlogUser
 # Register your models here.
 
 
 class PostAdmin(admin.ModelAdmin):
-    list_filter = (("created_at", DateRangeFilterBuilder(title="Created at")),)
+    list_filter = ("created_at", )
     list_display = ("title", "author")
     search_fields = ("title", "content")
     readonly_fields = ("author",)
