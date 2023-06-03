@@ -1,5 +1,5 @@
 ```bash
-pip install django django-stubs Pillow # substitute django-stubs for django-types maybe
+pip install django django-types Pillow # substitute django-stubs for django-stubs maybe
 ```
 The commands to initialize the project and the app are: (careful app and project names should be different) and keep the `.` in mind
 ```bash
@@ -10,7 +10,7 @@ python manage.py startapp <app_name>
 After that, add the app to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
-python manage.py makemigrations && python manage.py migrate
+python manage.py makemigrations && python manage.py migrate # have to type these separately on PoweShell
 ```
 
 ```bash
