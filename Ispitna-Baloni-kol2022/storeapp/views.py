@@ -10,6 +10,10 @@ def index(request):
 
 
 def flights(request: HttpRequest):
+    # check if anonymous user
+    if not request.user.is_authenticated:
+        return redirect("/admin/")
+
     context = dict()
     context["form"] = FlightForm
 
