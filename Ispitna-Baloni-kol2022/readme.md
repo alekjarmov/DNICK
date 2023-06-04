@@ -7,7 +7,7 @@ django-admin startproject <project_name> . # use a different project and app nam
 python manage.py startapp <app_name>
 ```
 
-After that, add the app to the `INSTALLED_APPS` list in `settings.py`.
+After that, add the "app_name" to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
 python manage.py makemigrations && python manage.py migrate # have to type these separately on PoweShell
