@@ -163,3 +163,35 @@ For background image
 ```html
 <div style="background-image: url('https://www.x.com'); width: 100%; background-position: center; background-size: cover; height: 500px;">
 ```
+
+Bootstrap properties
+```bash
+d-flex # for flex
+flex-column # for column flex
+justify-content-between # for main flex axis (default x) to make the content at the begging and at the end used for navbars
+align-items-center # secondary axis centering
+justify-content-center primary axis centering
+mb, mt, ms, me, mx, my same for padding b=bottom t=top, s=start, e=end 
+<button class="btn btn-success rounded-pill"> for a button which is rounded
+text-muted # for greyish text
+```
+
+Simplest bootstrap card
+```html
+        <div class="col-4">
+            <div class="card" style="">
+                <div style="height: 6rem;background: #5ec2a2" class="text-white text-center pt-3">
+                    <span class="pt-5">Single</span>
+                    <h3>$150</h3>
+                </div>
+                <div class="card-body text-center d-flex justify-content-center align-items-center flex-column py-4">
+                    Some text is here
+                </div>
+                <div class="card-footer">
+                    Card footer
+                </div>
+            </div>
+        </div>
+```
+
+
