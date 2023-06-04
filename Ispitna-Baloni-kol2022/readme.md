@@ -65,17 +65,24 @@ class FlightForm(forms.ModelForm):
 Forms in the backend:
 
 ```python
-def add(request):
-    if request.method == "POST":
-        form_data = BookForm(data=request.POST, files=request.FILES) # always the same, just change the Form class
-        if form_data.is_valid():
-            book = form_data.save(commit=False) # make commit=false so new changes can be made
-            book.user = request.user
-            book.cover_image = form_data.cleaned_data['cover_image'] # ImageFields should be handled like this
-            book.save()
-            return redirect("list") # name of where we want to redirect
+def flights(request: HttpRequest):
+    # check if anonymous user
+    if not request.user.is_authenticated:
+        return redirect("/admin/")
 
-    return render(request, "add.html", context={"form": BookForm})
+    context = dict()
+    context["form"] = FlightForm
+
+    if request.method == "POST":
+        form_data = FlightForm(data=request.POST, files=request.FILES)
+        if form_data.is_valid():
+            flight: Flight = form_data.save(commit=False)
+            flight.user = request.user
+            flight.picture = form_data.cleaned_data["picture"]
+            flight.save()
+            return redirect("flights")
+    context["flights"] = Flight.objects.all()
+    return render(request, "flights.html", context=context)
 ```
 
 Useful imports:
@@ -156,7 +163,15 @@ The other templates can then extend it and look like this, if we dont want to ex
     </ul>
 {% endblock %}
 ```
-<strong>Important</strong> note always add `{% csrf_token %}` in the forms.
+<strong>Important</strong> note always add `{% csrf_token %}` and the attribute `enctype="multipart/form-data"`in the forms.
+Example form:
+```jinja
+    <form action="/flights/" method="POST" class="mb-4 px-3" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+```
 
 Different CSS Properties
 For background image
