@@ -34,7 +34,7 @@
     </div>
 
 
-    <form action="/flights/" method="POST" class="mb-4">
+    <form action="/flights/" method="POST" class="mb-4 px-3" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Submit</button>
