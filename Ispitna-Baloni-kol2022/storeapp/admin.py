@@ -19,7 +19,7 @@ class FlightAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
     def save_model(self, request: HttpRequest, obj, form, change):
         obj.user = request.user
