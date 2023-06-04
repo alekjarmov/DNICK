@@ -131,6 +131,33 @@ class PublicationAdmin(admin.ModelAdmin):
 
 admin.site.register(Publication, PublicationAdmin)
 ```
+### Frontend
+In the app module create a folder called `templates` where the templates will be stored.
+
+#### Templating language tutorial
+The base template can look something like this
+```jinja
+{%  include "navbar.html" %}
+
+<div class="container main-container">
+
+    {% block content %} {% endblock %}
+</div>
+```
+The other templates can then extend it and look like this, if we dont want to extend a base template the include part is the most useful for the navbar or for a footer.
+```jinja
+{% extends 'base.html' %}
+
+{% block content %}
+    <ul>
+    {% for user in blocked %}
+        <li>{{ user }}</li>
+    {% endfor %}
+    </ul>
+{% endblock %}
+```
+<strong>Important</strong> note always add `{% csrf_token %}` in the forms.
+
 Different CSS Properties
 For background image
 ```html
