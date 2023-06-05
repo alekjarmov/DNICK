@@ -1,5 +1,6 @@
 The commands to initialize the project and the app are: (careful app and project names should be different) and keep the `.` in mind
 ```bash
+pip install django Pillow # can try django-types and djnago-stubs as well for typing support
 django-admin startproject <project_name> . # use a different project and app name
 python manage.py startapp <app_name>
 ```
@@ -7,8 +8,7 @@ python manage.py startapp <app_name>
 After that, add the "app_name" to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
-pip install django django-types Pillow # substitute django-types for djang-stubs would only work with python 3.8+
-python manage.py makemigrations && python manage.py migrate # have to type these separately on PoweShell
+python manage.py makemigrations && python manage.py migrate # have to type these separately on PowerShell
 python manage.py createsuperuser
 python manage.py runserver
 ```
