@@ -1,6 +1,3 @@
-```bash
-pip install django django-types Pillow # substitute django-stubs for django-stubs maybe
-```
 The commands to initialize the project and the app are: (careful app and project names should be different) and keep the `.` in mind
 ```bash
 django-admin startproject <project_name> . # use a different project and app name
@@ -10,14 +7,9 @@ python manage.py startapp <app_name>
 After that, add the "app_name" to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
+pip install django django-types Pillow # substitute django-types for djang-stubs would only work with python 3.8+
 python manage.py makemigrations && python manage.py migrate # have to type these separately on PoweShell
-```
-
-```bash
 python manage.py createsuperuser
-```
-
-```bash
 python manage.py runserver
 ```
 
@@ -174,7 +166,7 @@ Example form:
 ```
 
 Different CSS Properties
-For background image
+For div with a background image
 ```html
 <div style="background-image: url('https://www.x.com'); width: 100%; background-position: center; background-size: cover; height: 500px;">
 ```
