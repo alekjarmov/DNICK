@@ -65,7 +65,7 @@ class MyClassForm(forms.ModelForm):
         exclude = ("user", )
 ```
 
-VIEWS.py in the backend:
+views.py in the backend:
 
 ```python
 def flights(request: HttpRequest):
@@ -183,4 +183,18 @@ gap-x, g-x, gb-2, gap-2 # to change space between columns/rows g and flex elemen
 mb, mt, ms, me, mx, my same for padding b=bottom t=top, s=start, e=end 
 <button class="btn btn-success rounded-pill"> for a button which is rounded
 text-muted # for greyish text
+```
+Simple card
+```jinja
+        <div class="card border-light col-3 my-3 border-0" style="">
+            <img src="{{product.image.url}}" class="card-img-top" alt="...">
+            <div class="card-body text-center">
+                <p class="card-text text-center">
+                <div class="text-muted">
+                    {{product.name}}
+                </div>
+                <h6 class="font-weight-bold">${{product.price}}</h6>
+                </p>
+            </div>
+        </div>
 ```
