@@ -1,14 +1,14 @@
-The commands to initialize the project and the app are: (careful app and project names should be different) and keep the `.` in mind
+
 ```bash
-pip install django Pillow # can try django-types and djnago-stubs as well for typing support
-django-admin startproject <project_name> . # use a different project and app name
-python manage.py startapp <app_name>
+pip install django Pillow # maybe django-stubs djnago-types
+django-admin startproject <project_name> . # notice the .
+python manage.py startapp <app_name> # use a different project and app name
 ```
 
 After that, add the "app_name" to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
-python manage.py makemigrations && python manage.py migrate # have to type these separately on PowerShell
+python manage.py makemigrations && python manage.py migrate # run separate
 python manage.py createsuperuser
 python manage.py runserver
 ```
@@ -69,13 +69,9 @@ VIEWS.py in the backend:
 
 ```python
 def flights(request: HttpRequest):
-    # check if anonymous user
     if not request.user.is_authenticated:
         return redirect("/admin/")
-
     context = dict()
-    context["form"] = FlightForm
-
     if request.method == "POST":
         form_data = FlightForm(data=request.POST, files=request.FILES)
         if form_data.is_valid():
@@ -84,6 +80,7 @@ def flights(request: HttpRequest):
             flight.image = form_data.cleaned_data["image"]
             flight.save()
             return redirect("flights")
+    context["form"] = FlightForm
     context["flights"] = Flight.objects.filter(airport_takeoff=2, pilot__name="John").all()
     return render(request, "flights.html", context=context)
 ```
@@ -139,20 +136,16 @@ admin.site.register(Publication, PublicationAdmin)
 ### Frontend
 In the app module create a folder called `templates` where the templates will be stored.
 
-#### Templating language tutorial
-The base template can look something like this
+The base template can look something like this:
 ```jinja
 {%  include "navbar.html" %}
-
 <div class="container main-container">
-
     {% block content %} {% endblock %}
 </div>
 ```
-The other templates can then extend it and look like this, if we dont want to extend a base template the include part is the most useful for the navbar or for a footer.
+The other templates can then extend it or just `{%  include "navbar.html" %}`
 ```jinja
 {% extends 'base.html' %}
-
 {% block content %}
     <ul>
     {% for user in blocked %}
@@ -161,8 +154,7 @@ The other templates can then extend it and look like this, if we dont want to ex
     </ul>
 {% endblock %}
 ```
-<strong>Important</strong> note always add `{% csrf_token %}` and the attribute `enctype="multipart/form-data"`in the forms.
-Example form:
+Form in frontend:
 ```jinja
     <form action="/flights/" method="POST" class="mb-4 px-3" enctype="multipart/form-data">
         {% csrf_token %}
