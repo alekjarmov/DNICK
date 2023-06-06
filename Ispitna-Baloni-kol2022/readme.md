@@ -1,23 +1,15 @@
+
 ```bash
-pip install django django-types Pillow # substitute django-stubs for django-stubs maybe
-```
-The commands to initialize the project and the app are: (careful app and project names should be different) and keep the `.` in mind
-```bash
-django-admin startproject <project_name> . # use a different project and app name
-python manage.py startapp <app_name>
+pip install django Pillow # maybe django-stubs djnago-types
+django-admin startproject <project_name> . # notice the .
+python manage.py startapp <app_name> # use a different project and app name
 ```
 
 After that, add the "app_name" to the `INSTALLED_APPS` list in `settings.py`.
 
 ```bash
-python manage.py makemigrations && python manage.py migrate # have to type these separately on PoweShell
-```
-
-```bash
+python manage.py makemigrations && python manage.py migrate # run separate
 python manage.py createsuperuser
-```
-
-```bash
 python manage.py runserver
 ```
 
@@ -28,7 +20,19 @@ import os
 MEDIA_ROOT = os.path.join(BASE_DIR, "data/")
 MEDIA_URL = '/data/'
 ```
-
+Models possible fields with their required arguments
+```py
+class MyModel(models.Model):
+    name = models.CharField(max_length=50)
+    description = models.TextField(null=False, Blank=False, default="LOL")
+    category = models.ForeignKey(OtherModel, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images')
+    email = models.EmailField()
+    stuff = models.ManyToManyField(OtherModel)
+    
+    def __str__(self):
+        return f"{self.name}"
+```
 In `urls.py`, add the needed paths, in this case `/index/` and `/flights/`, as well as the static folder which should be the same regardless of the task. `views.py` should look like this:
 
 ```python
@@ -40,7 +44,7 @@ from storeapp.views import index, flights # could be changed
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('index/', index, name='index'), # could be changed
+    path('index/', index, name='index'), # could be changed MUST HAVE name='something'
     path('flights/', flights, name='flights') # could be changed
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
@@ -49,39 +53,35 @@ A new file called `forms.py` should be added in the app. This will usually conta
 
 ```python
 from django import forms
-from .models import Flight
+from .models import MyClass
 
-class FlightForm(forms.ModelForm):
+class MyClassForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(FlightForm, self).__init__(*args, **kwargs)
+        super(MyClassForm, self).__init__(*args, **kwargs)
         for field in self.visible_fields():
             field.field.widget.attrs["class"] = "form-control"
-
     class Meta:
-        model = Flight
+        model = MyClass
         exclude = ("user", )
 ```
 
-Forms in the backend:
+views.py in the backend:
 
 ```python
 def flights(request: HttpRequest):
-    # check if anonymous user
     if not request.user.is_authenticated:
         return redirect("/admin/")
-
     context = dict()
-    context["form"] = FlightForm
-
     if request.method == "POST":
         form_data = FlightForm(data=request.POST, files=request.FILES)
         if form_data.is_valid():
             flight: Flight = form_data.save(commit=False)
             flight.user = request.user
-            flight.picture = form_data.cleaned_data["picture"]
+            flight.image = form_data.cleaned_data["image"]
             flight.save()
             return redirect("flights")
-    context["flights"] = Flight.objects.all()
+    context["form"] = FlightForm
+    context["flights"] = Flight.objects.filter(airport_takeoff=2, pilot__name="John").all()
     return render(request, "flights.html", context=context)
 ```
 
@@ -113,20 +113,15 @@ class PublicationAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         pass
-
     def has_delete_permission(self, request, obj=None):
         pass
-
     def has_delete_permission(self, request, obj=None):
         pass
-
     def has_view_permission(self, request, obj=None):
         pass
-
     def save_model(self, request: HttpRequest, obj, form, change):
         obj.user = request.user
         super().save_model(request, obj, form, change)
-
     def get_queryset(self, request): # wrong model to show example
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -141,20 +136,16 @@ admin.site.register(Publication, PublicationAdmin)
 ### Frontend
 In the app module create a folder called `templates` where the templates will be stored.
 
-#### Templating language tutorial
-The base template can look something like this
+The base template can look something like this:
 ```jinja
 {%  include "navbar.html" %}
-
 <div class="container main-container">
-
     {% block content %} {% endblock %}
 </div>
 ```
-The other templates can then extend it and look like this, if we dont want to extend a base template the include part is the most useful for the navbar or for a footer.
+The other templates can then extend it or just `{%  include "navbar.html" %}`
 ```jinja
 {% extends 'base.html' %}
-
 {% block content %}
     <ul>
     {% for user in blocked %}
@@ -163,8 +154,7 @@ The other templates can then extend it and look like this, if we dont want to ex
     </ul>
 {% endblock %}
 ```
-<strong>Important</strong> note always add `{% csrf_token %}` and the attribute `enctype="multipart/form-data"`in the forms.
-Example form:
+Form in frontend:
 ```jinja
     <form action="/flights/" method="POST" class="mb-4 px-3" enctype="multipart/form-data">
         {% csrf_token %}
@@ -174,9 +164,12 @@ Example form:
 ```
 
 Different CSS Properties
-For background image
+For div with a background image and for a bold underline
 ```html
 <div style="background-image: url('https://www.x.com'); width: 100%; background-position: center; background-size: cover; height: 500px;">
+<div class="d-flex justify-content-center">
+  <div class="border-bottom border-3 border-success align-self-center " style="width:8rem"></div>
+</div>
 ```
 
 Bootstrap properties
@@ -186,27 +179,22 @@ flex-column # for column flex
 justify-content-between # for main flex axis (default x) to make the content at the begging and at the end used for navbars
 align-items-center # secondary axis centering
 justify-content-center primary axis centering
+gap-x, g-x, gb-2, gap-2 # to change space between columns/rows g and flex elements gap
 mb, mt, ms, me, mx, my same for padding b=bottom t=top, s=start, e=end 
 <button class="btn btn-success rounded-pill"> for a button which is rounded
 text-muted # for greyish text
 ```
-
-Simplest bootstrap card
-```html
-        <div class="col-4">
-            <div class="card" style="">
-                <div style="height: 6rem;background: #5ec2a2" class="text-white text-center pt-3">
-                    <span class="pt-5">Single</span>
-                    <h3>$150</h3>
+Simple card
+```jinja
+        <div class="card border-light col-3 my-3 border-0" style="">
+            <img src="{{product.image.url}}" class="card-img-top" alt="...">
+            <div class="card-body text-center">
+                <p class="card-text text-center">
+                <div class="text-muted">
+                    {{product.name}}
                 </div>
-                <div class="card-body text-center d-flex justify-content-center align-items-center flex-column py-4">
-                    Some text is here
-                </div>
-                <div class="card-footer">
-                    Card footer
-                </div>
+                <h6 class="font-weight-bold">${{product.price}}</h6>
+                </p>
             </div>
         </div>
 ```
-
-
